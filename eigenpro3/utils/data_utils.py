@@ -32,8 +32,8 @@ def load_svhn_data(**kwargs):
     )
 
 def load_mnist_data(**kwargs):
-    train_data = MNIST(os.environ['DATA_DIR'], train=True)
-    test_data = MNIST(os.environ['DATA_DIR'], train=False)
+    train_data = MNIST(os.environ['DATA_DIR'], train=True, download=True)
+    test_data = MNIST(os.environ['DATA_DIR'], train=False, download=True)
     n_class = len(train_data.classes)
     return (
         n_class,
