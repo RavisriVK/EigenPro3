@@ -55,9 +55,9 @@ def mean_squared_error(alpha, centers, dataloader, kernel_fn, device=torch.devic
         kxbatchz = kernel_fn(X_batch,centers)
         y_batch = y_batch.to(device)
 
-        cnt += X_batch.shape[0]
+        cnt += y_batch.shape[0] * y_batch.shape[1]
         yhat_test = kxbatchz@alpha
-        mse += torch.sum(torch.mean(torch.square(yhat_test - y_batch), dim=-1))
+        mse += torch.sum(torch.square(yhat_test - y_batch))
 
         del X_batch, y_batch
         torch.cuda.empty_cache()
