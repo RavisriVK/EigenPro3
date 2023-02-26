@@ -46,6 +46,25 @@ def accuracy(alpha, centers, dataloader, kernel_fn, device=torch.device('cpu')):
 
     return accu
 
+def mean_squared_error(alpha, centers, dataloader, kernel_fn, device=torch.device('cpu')):
+    alpha= alpha.to(device)
+    mse = 0
+    cnt = 0
+    for (X_batch,y_batch) in dataloader:
+        X_batch = X_batch.to(device)
+        kxbatchz = kernel_fn(X_batch,centers)
+        y_batch = y_batch.to(device)
+
+        cnt += X_batch.shape[0]
+        yhat_test = kxbatchz@alpha
+        mse += torch.sum(torch.mean(torch.square(yhat_test - y_batch), dim=-1))
+
+        del X_batch, y_batch
+        torch.cuda.empty_cache()
+
+    mse = mse / cnt
+
+    return mse
 
 def fmm(k, theta, y,device):
     grad = (k @ theta)
