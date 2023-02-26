@@ -1,6 +1,7 @@
 from .svd import nystrom_kernel_svd
 import torch
 import numpy as np
+from torch.nn.functional import one_hot
 from torch.utils.data import Dataset, DataLoader
 
 # def get_optimal_params(mem_gb):
@@ -24,19 +25,21 @@ def Yaccu(y,method = 'argmax'):
 
     return y_s
 
-
-def accuracy(alpha, centers, dataloader, kernel_fn, device=torch.device('cpu')):
+def accuracy(alpha, centers, dataloader, kernel_fn, device=torch.device('cpu'), one_hot_labels=False):
     alpha= alpha.to(device)
     accu = 0
     cnt = 0
     for (X_batch,y_batch) in dataloader:
         X_batch = X_batch.to(device)
         kxbatchz = kernel_fn(X_batch,centers)
+        if one_hot_labels:
+            y_batch = torch.argmax(y_batch, dim=1)
         y_batch = y_batch.to(device)
 
         cnt += X_batch.shape[0]
         yhat_test = kxbatchz@alpha
         yhat_test_sign = Yaccu(yhat_test)
+
         accu += sum(yhat_test_sign == y_batch)
 
         del X_batch, y_batch
@@ -46,17 +49,21 @@ def accuracy(alpha, centers, dataloader, kernel_fn, device=torch.device('cpu')):
 
     return accu
 
-def mean_squared_error(alpha, centers, dataloader, kernel_fn, device=torch.device('cpu')):
+def mean_squared_error(alpha, centers, dataloader, kernel_fn, device=torch.device('cpu'), one_hot_labels=True):
     alpha= alpha.to(device)
     mse = 0
     cnt = 0
     for (X_batch,y_batch) in dataloader:
         X_batch = X_batch.to(device)
         kxbatchz = kernel_fn(X_batch,centers)
-        y_batch = y_batch.to(device)
 
         cnt += y_batch.shape[0] * y_batch.shape[1]
         yhat_test = kxbatchz@alpha
+
+        if not one_hot_labels:
+            y_batch = one_hot(y_batch, yhat_test.shape[1])
+        y_batch = y_batch.to(device)
+
         mse += torch.sum(torch.square(yhat_test - y_batch))
 
         del X_batch, y_batch
