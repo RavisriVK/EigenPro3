@@ -23,11 +23,9 @@ def load_svhn_data(**kwargs):
     train_data = SVHN(os.environ['DATA_DIR'], split='train', download=True)
     test_data = SVHN(os.environ['DATA_DIR'], split='test', download=True)
     n_class = max(train_data.labels) - min(train_data.labels) + 1
-    num_train_samples = train_data.data.shape[0]
-    subsample_idx = torch.tensor(random.sample(list(range(num_train_samples)), 5000))
     return (
         n_class,
-        (torch.tensor(train_data.data)[subsample_idx], torch.tensor(train_data.labels)[subsample_idx]),
+        (torch.tensor(train_data.data), torch.tensor(train_data.labels)),
         (torch.tensor(test_data.data), torch.tensor(test_data.labels)),
     )
 
