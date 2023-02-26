@@ -57,8 +57,8 @@ def mean_squared_error(alpha, centers, dataloader, kernel_fn, device=torch.devic
         X_batch = X_batch.to(device)
         kxbatchz = kernel_fn(X_batch,centers)
 
-        cnt += y_batch.shape[0] * y_batch.shape[1]
         yhat_test = kxbatchz@alpha
+        cnt += yhat_test.shape[0] * yhat_test.shape[1]
 
         if not one_hot_labels:
             y_batch = one_hot(y_batch, yhat_test.shape[1])
