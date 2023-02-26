@@ -1,6 +1,6 @@
 import torch, os
 import random
-from torchvision.datasets import MNIST, EMNIST, FashionMNIST, KMNIST, CIFAR10
+from torchvision.datasets import MNIST, EMNIST, FashionMNIST, KMNIST, CIFAR10, SVHN
 from torch.nn.functional import one_hot
 from .printing import midrule
 
