@@ -1,4 +1,5 @@
 import torch, os
+import random
 from torchvision.datasets import MNIST, EMNIST, FashionMNIST, KMNIST, CIFAR10
 from torch.nn.functional import one_hot
 from .printing import midrule
@@ -18,6 +19,17 @@ def load_cifar10_data(**kwargs):
         (torch.from_numpy(test_data.data), torch.LongTensor(test_data.targets)),
     )
 
+def load_svhn_data(**kwargs):
+    train_data = SVHN(os.environ['DATA_DIR'], split='train', download=True)
+    test_data = SVHN(os.environ['DATA_DIR'], split='test', download=True)
+    n_class = max(train_data.labels) - min(train_data.labels) + 1
+    num_train_samples = train_data.data.shape[0]
+    subsample_idx = torch.tensor(random.sample(list(range(num_train_samples)), 5000))
+    return (
+        n_class,
+        (torch.tensor(train_data.data)[subsample_idx], torch.tensor(train_data.labels)[subsample_idx]),
+        (torch.tensor(test_data.data), torch.tensor(test_data.labels)),
+    )
 
 def load_mnist_data(**kwargs):
     train_data = MNIST(os.environ['DATA_DIR'], train=True)
